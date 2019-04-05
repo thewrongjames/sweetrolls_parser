@@ -1,0 +1,61 @@
+{
+  "name": "sweetrolls_parser",
+  "version": "0.0.0",
+  "description": "A parser for a small dice rolling math language for a web app for rolling dice with friends.",
+  "main": "built/index.js",
+  "scripts": {
+    "build": "tsc && standard --fix built/**/*.js",
+    "test": "jest --coverage",
+    "lint": "eslint 'source/**/*.ts' && eslint 'source/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thewrongjames/sweetrolls_parser.git"
+  },
+  "author": "James Wright",
+  "bugs": {
+    "url": "https://github.com/thewrongjames/sweetrolls_parser/issues"
+  },
+  "homepage": "https://github.com/thewrongjames/sweetrolls_parser#readme",
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "standard"
+    ],
+    "globals": {
+      "test": true,
+      "expect": true,
+      "describe": true
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/node": "11.11.3",
+    "@typescript-eslint/eslint-plugin": "^1.4.2",
+    "@typescript-eslint/parser": "^1.4.2",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-typescript": "^0.14.0",
+    "jest": "^24.7.1",
+    "standard": "^12.0.1",
+    "ts-jest": "^24.0.1",
+    "typescript": "3.3.3333",
+    "typescript-eslint-parser": "^22.0.0"
+  },
+  "standard": {
+    "globals": [
+      "test",
+      "expect",
+      "describe"
+    ]
+  }
+}
