@@ -1,3 +1,7 @@
-import Node from './node'
+import BaseNode from './nodes/base-node'
+import Parser from './parser'
 
-export const parse = (string: String): Node => new Node()
+export const parse = (string: string): BaseNode => {
+  const parser = new Parser(string)
+  return parser.parse()
+}

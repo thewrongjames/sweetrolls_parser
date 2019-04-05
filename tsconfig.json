@@ -3,7 +3,10 @@
     "outDir": "./built",
     "allowJs": true,
     "target": "es6",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": [
+      "es2017"
+    ]
   },
   "include": [
     "./source/**/*"

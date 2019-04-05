@@ -1,8 +1,10 @@
 import { parse } from '../source/index'
+import SweetRollsSyntaxError from
+  '../source/exceptions/sweet-rolls-syntax-error'
 
-test('An empty string does almost nothing', () => {
+test('An empty string fails to parse', () => {
   const rootNode = parse('')
-  expect(rootNode.run()).toBe(0)
+  expect(rootNode.run).toThrow(SweetRollsSyntaxError)
 })
 
 test('Numbers result in themselves', () => {

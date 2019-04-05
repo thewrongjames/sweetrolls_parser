@@ -20,7 +20,8 @@
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-      "project": "./tsconfig.json"
+      "project": "./tsconfig.json",
+      "ecmaVersion": 7
     },
     "plugins": [
       "@typescript-eslint"
@@ -32,7 +33,23 @@
       "test": true,
       "expect": true,
       "describe": true
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts",
+          "**/*.tsx"
+        ],
+        "rules": {
+          "no-unused-vars": [
+            "off"
+          ],
+          "no-undef": [
+            "off"
+          ]
+        }
+      }
+    ]
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
@@ -44,7 +61,7 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-typescript": "^0.14.0",
+    "eslint-plugin-typescript": "github:nzakas/eslint-plugin-typescript",
     "jest": "^24.7.1",
     "standard": "^12.0.1",
     "ts-jest": "^24.0.1",
