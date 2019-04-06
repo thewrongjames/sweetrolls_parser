@@ -1,27 +1,57 @@
 import BaseNode from './nodes/base-node'
 import NumberNode from './nodes/number-node'
+import BinaryOperationNode from './nodes/binary-operation-node'
 
+import SweetRollsError from './exceptions/sweet-rolls-error'
 import SweetRollsSyntaxError from './exceptions/sweet-rolls-syntax-error'
 
-const digits = '0123456789'
+import BinaryOperator from './binaryOperator'
 
+import BINARY_OPERATORS from './binaryOperators'
+
+const ERROR_CONTEXT_LENGTH = 10
+const DIGITS = '0123456789'
+
+/**
+ * An object oriented parser for the SweetRolls language. It takes a string to
+ * parse on construction, and builds and returns a constructed node tree at a
+ * call to parse().
+ */
 export default class Parser {
   input: string
   positionInInput = 0
 
+  /**
+   * Make a parser.
+   * @param {string} input The string that this parser will parse.
+   */
   constructor (input: string) {
     this.input = input
   }
 
-  parse (): BaseNode {
-    return this.parseNumber()
+  /**
+   * Parse the input assigned to this parser.
+   * @returns {BaseNode} The root of the tree resulting from the parse. Calling
+   * run() on this node will evaluate the input.
+   */
+  public parse (): BaseNode {
+    this.positionInInput = 0
+
+    const numberNode = this.parseNumber()
+    if (this.finished()) return numberNode
+
+    return this.parseRestOfBinaryOperation(numberNode)
   }
 
-  next (): string {
+  private next (): string {
     return this.input[this.positionInInput]
   }
 
-  consumeCharacter (): string {
+  private finished (): boolean {
+    return this.positionInInput === this.input.length
+  }
+
+  private consumeCharacter (): string {
     if (!this.next()) {
       throw new SweetRollsSyntaxError(
         `Unexpected end of input at ${this.positionInInput}`
@@ -33,30 +63,66 @@ export default class Parser {
     return consumedCharacter
   }
 
-  consumeNumber (): number {
+  /**
+   * Throw a syntax error informing the user of what was received and what was
+   * expected. Reset the position in the parse before doing it though, in case
+   * this is going to be caught internally after a failed parse attempt of an
+   * optional component.
+   * @param {string} expected What to tell the user was expected at this
+   * position.
+   * @param {number} resetTo The position to move the parse back to just before
+   * throwing the error.
+   */
+  private throwExpectionError (expected: string, resetTo: number): never {
+    const invalidInput = this.input.substring(
+      this.positionInInput, this.positionInInput + ERROR_CONTEXT_LENGTH
+    )
+    const errorContext = invalidInput ? `'${invalidInput}'` : 'end of input'
+    const errorPosition = this.positionInInput
+    this.positionInInput = resetTo
+    throw new SweetRollsSyntaxError(
+      `Expected ${expected} but got ${errorContext} at ${errorPosition}`
+    )
+  }
+
+  private consumeNumber (): number {
+    const startPosition = this.positionInInput
+
     let stringOfNumber = ''
 
-    while (digits.includes(this.next())) {
+    while (DIGITS.includes(this.next())) {
       stringOfNumber += this.consumeCharacter()
     }
 
-    if (!stringOfNumber) {
-      let invalidInput = this.input.substring(
-        this.positionInInput, this.positionInInput + 10
-      )
-      if (!invalidInput) {
-        invalidInput = 'end of input'
-      }
-      throw new SweetRollsSyntaxError(
-        `Expected number but got ${invalidInput} at ${this.positionInInput}`
-      )
-    }
+    if (!stringOfNumber) this.throwExpectionError('number', startPosition)
 
     return parseInt(stringOfNumber)
   }
 
-  parseNumber (): NumberNode {
+  private parseNumber (): NumberNode {
     const number = this.consumeNumber()
     return new NumberNode(number)
+  }
+
+  private parseRestOfBinaryOperation (
+    leftNode: NumberNode
+  ): BinaryOperationNode {
+    const startPosition = this.positionInInput
+
+    if (!BINARY_OPERATORS.includes(this.next())) {
+      this.throwExpectionError('one of ' + BINARY_OPERATORS, startPosition)
+    }
+
+    const operator: BinaryOperator = this.consumeCharacter() as BinaryOperator
+
+    let rightNode
+    try {
+      rightNode = this.parseNumber()
+    } catch (error) {
+      if (!(error instanceof SweetRollsError)) throw Error
+      this.throwExpectionError('number', startPosition)
+    }
+
+    return new BinaryOperationNode(leftNode, operator, rightNode)
   }
 }

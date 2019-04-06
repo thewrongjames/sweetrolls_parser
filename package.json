@@ -4,7 +4,8 @@
   "description": "A parser for a small dice rolling math language for a web app for rolling dice with friends.",
   "main": "built/index.js",
   "scripts": {
-    "build": "tsc && standard --fix built/**/*.js",
+    "start": "tsc --build tsconfig.json && node built/repl.js",
+    "build": "tsc --build tsconfig.json",
     "test": "jest --coverage",
     "lint": "eslint 'source/**/*.ts' && eslint 'source/**/*.ts'"
   },
@@ -36,17 +37,10 @@
     },
     "overrides": [
       {
-        "files": [
-          "**/*.ts",
-          "**/*.tsx"
-        ],
+        "files": ["**/*.ts"],
         "rules": {
-          "no-unused-vars": [
-            "off"
-          ],
-          "no-undef": [
-            "off"
-          ]
+          "no-unused-vars": ["off"],
+          "no-undef": ["off"]
         }
       }
     ]
@@ -73,6 +67,7 @@
       "test",
       "expect",
       "describe"
-    ]
+    ],
+    "ignore": ["built"]
   }
 }
