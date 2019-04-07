@@ -14,3 +14,8 @@ test('Simple subtraction works', () => {
   const rootNode = parse('12- 67')
   expect(rootNode.run()).toEqual(-55)
 })
+
+test('Simple division works', () => {
+  const rootNode = parse('8 / 9')
+  expect(rootNode.run()).toEqual(0.8888888888888888)
+})

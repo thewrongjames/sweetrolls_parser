@@ -37,10 +37,7 @@ export default class Parser {
   public parse (): BaseNode {
     this.positionInInput = 0
 
-    const numberNode = this.parseNumber()
-    if (this.finished()) return numberNode
-
-    return this.parseRestOfBinaryOperation(numberNode)
+    return this.parseExpression(false)
   }
 
   private next (): string {
@@ -99,13 +96,38 @@ export default class Parser {
     return parseInt(stringOfNumber)
   }
 
+  private parseExpression (isBracketed: boolean): BaseNode {
+    const termNode = this.parseTerm()
+
+    let finished = this.finished()
+    if (isBracketed && this.next() === ')') {
+      finished = true
+      this.consumeCharacter()
+    }
+    if (finished) return termNode
+
+    const binaryOperationNode = this.parseRestOfBinaryOperation(termNode)
+
+    if (isBracketed && this.next() === ')') this.consumeCharacter()
+
+    return binaryOperationNode
+  }
+
+  private parseTerm (): BaseNode {
+    if (this.next() === '(') {
+      this.consumeCharacter()
+      return this.parseExpression(true)
+    }
+    return this.parseNumber()
+  }
+
   private parseNumber (): NumberNode {
     const number = this.consumeNumber()
     return new NumberNode(number)
   }
 
   private parseRestOfBinaryOperation (
-    leftNode: NumberNode
+    leftNode: BaseNode
   ): BinaryOperationNode {
     const startPosition = this.positionInInput
 
@@ -115,9 +137,9 @@ export default class Parser {
 
     const operator: BinaryOperator = this.consumeCharacter() as BinaryOperator
 
-    let rightNode
+    let rightNode: BaseNode
     try {
-      rightNode = this.parseNumber()
+      rightNode = this.parseTerm()
     } catch (error) {
       if (!(error instanceof SweetRollsError)) throw Error
       this.throwExpectionError('number', startPosition)

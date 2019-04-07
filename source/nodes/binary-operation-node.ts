@@ -12,7 +12,8 @@ export default class BinaryOperationNode implements BaseNode {
   private operations = {
     '+': (left: number, right: number): number => left + right,
     '-': (left: number, right: number): number => left - right,
-    '*': (left: number, right: number): number => left * right
+    '*': (left: number, right: number): number => left * right,
+    '/': (left: number, right: number): number => left / right
   }
 
   /**

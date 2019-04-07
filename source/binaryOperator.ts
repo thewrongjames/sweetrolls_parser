@@ -1,3 +1,3 @@
-type BinaryOperator = '+' | '-' | '*'
+type BinaryOperator = '+' | '-' | '*' | '/'
 
 export default BinaryOperator
