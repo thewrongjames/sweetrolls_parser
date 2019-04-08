@@ -1,9 +1,9 @@
-import BaseNode from './base-node'
+import IndividualNode from './individual-node'
 
 /**
  * A simple node that just stores and returns a number.
  */
-export default class NumberNode implements BaseNode {
+export default class NumberNode implements IndividualNode {
   private value: number
 
   /**

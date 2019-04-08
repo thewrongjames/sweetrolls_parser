@@ -1,6 +1,8 @@
-import BaseNode from './nodes/base-node'
+import IndividualNode from './nodes/individual-node'
+import SequenceNode from './nodes/sequence-node'
 import NumberNode from './nodes/number-node'
 import BinaryOperationNode from './nodes/binary-operation-node'
+import NegativeNode from './nodes/negative-node'
 
 import SweetRollsError from './exceptions/sweet-rolls-error'
 import SweetRollsSyntaxError from './exceptions/sweet-rolls-syntax-error'
@@ -31,13 +33,13 @@ export default class Parser {
 
   /**
    * Parse the input assigned to this parser.
-   * @returns {BaseNode} The root of the tree resulting from the parse. Calling
-   * run() on this node will evaluate the input.
+   * @returns {SequenceNode} The root of the tree resulting from the parse.
+   * Calling run() on this node will evaluate the input.
    */
-  public parse (): BaseNode {
+  public parse (): SequenceNode {
     this.positionInInput = 0
 
-    return this.parseExpression(false)
+    return this.parseSequence()
   }
 
   private next (): string {
@@ -58,6 +60,19 @@ export default class Parser {
     const consumedCharacter = this.next()
     this.positionInInput += 1
     return consumedCharacter
+  }
+
+  /**
+   * Consume the next character in the input if it is equal to the given
+   * character.
+   * @param character The character to maybe consume.
+   * @returns {boolean} Whether or not the next character was the given
+   * character (and hence whether or not it was consumed).
+   */
+  private consumeCharacterIfItIs (character: string): boolean {
+    if (this.next() !== character) return false
+    this.consumeCharacter()
+    return true
   }
 
   /**
@@ -96,29 +111,53 @@ export default class Parser {
     return parseInt(stringOfNumber)
   }
 
-  private parseExpression (isBracketed: boolean): BaseNode {
+  private parseSequence (): SequenceNode {
+    const individualNodes: IndividualNode[] = []
+    do {
+      individualNodes.push(this.parseExpression(false))
+    } while (this.consumeCharacterIfItIs(','))
+
+    return new SequenceNode(individualNodes)
+  }
+
+  private parseExpression (isBracketed: boolean): IndividualNode {
+    const startPosition = this.positionInInput
+
     const termNode = this.parseTerm()
 
-    let finished = this.finished()
-    if (isBracketed && this.next() === ')') {
+    let finished = this.finished() || this.next() === ','
+
+    // We have reached what should be the end of an expression (the end of input
+    // or a comma) but we didn't close the brackets containing this expression
+    // first.
+    if (finished && isBracketed) this.throwExpectionError(')', startPosition)
+
+    if (isBracketed && this.consumeCharacterIfItIs(')')) {
       finished = true
-      this.consumeCharacter()
     }
     if (finished) return termNode
 
     const binaryOperationNode = this.parseRestOfBinaryOperation(termNode)
 
-    if (isBracketed && this.next() === ')') this.consumeCharacter()
+    if (isBracketed && !this.consumeCharacterIfItIs(')')) {
+      this.throwExpectionError(')', startPosition)
+    }
 
     return binaryOperationNode
   }
 
-  private parseTerm (): BaseNode {
+  private parseTerm (): IndividualNode {
+    const isNegative = this.consumeCharacterIfItIs('-')
+    let result: IndividualNode
+
     if (this.next() === '(') {
       this.consumeCharacter()
-      return this.parseExpression(true)
+      result = this.parseExpression(true)
+    } else {
+      result = this.parseNumber()
     }
-    return this.parseNumber()
+
+    return isNegative ? new NegativeNode(result) : result
   }
 
   private parseNumber (): NumberNode {
@@ -127,7 +166,7 @@ export default class Parser {
   }
 
   private parseRestOfBinaryOperation (
-    leftNode: BaseNode
+    leftNode: IndividualNode
   ): BinaryOperationNode {
     const startPosition = this.positionInInput
 
@@ -137,7 +176,7 @@ export default class Parser {
 
     const operator: BinaryOperator = this.consumeCharacter() as BinaryOperator
 
-    let rightNode: BaseNode
+    let rightNode: IndividualNode
     try {
       rightNode = this.parseTerm()
     } catch (error) {
