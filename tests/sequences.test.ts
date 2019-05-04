@@ -1,4 +1,6 @@
 import { parse } from '../source/index'
+import SweetRollsRuntimeError from
+  '../source/exceptions/sweet-rolls-runtime-error'
 
 test('Basic sequences work', () => {
   const rootNode = parse('4, (8 + 9) - (2 * 5), 6 * 3, 5 / 3')

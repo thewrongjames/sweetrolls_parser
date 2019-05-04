@@ -42,8 +42,16 @@ export default class Parser {
     return this.parseSequence()
   }
 
+  /**
+   * Return the next unconsumed character in the input. Return null if there are
+   * no characters left.
+   * @returns {string} The next unconsumed character in the input, or null if
+   * there are none left.
+   */
   private next (): string {
-    return this.input[this.positionInInput]
+    const nextCharacter =
+      this.input.substring(this.positionInInput, this.positionInInput + 1)
+    return nextCharacter || null
   }
 
   private finished (): boolean {
@@ -75,6 +83,20 @@ export default class Parser {
     return true
   }
 
+  private consumeNumber (): number {
+    const startPosition = this.positionInInput
+
+    let stringOfNumber = ''
+
+    while (DIGITS.includes(this.next())) {
+      stringOfNumber += this.consumeCharacter()
+    }
+
+    if (!stringOfNumber) this.throwExpectionError('number', startPosition)
+
+    return parseInt(stringOfNumber)
+  }
+
   /**
    * Throw a syntax error informing the user of what was received and what was
    * expected. Reset the position in the parse before doing it though, in case
@@ -95,20 +117,6 @@ export default class Parser {
     throw new SweetRollsSyntaxError(
       `Expected ${expected} but got ${errorContext} at ${errorPosition}`
     )
-  }
-
-  private consumeNumber (): number {
-    const startPosition = this.positionInInput
-
-    let stringOfNumber = ''
-
-    while (DIGITS.includes(this.next())) {
-      stringOfNumber += this.consumeCharacter()
-    }
-
-    if (!stringOfNumber) this.throwExpectionError('number', startPosition)
-
-    return parseInt(stringOfNumber)
   }
 
   private parseSequence (): SequenceNode {
