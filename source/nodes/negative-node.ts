@@ -7,7 +7,7 @@ export default class NegativeNode implements IndividualNode {
     this.nodeToNegate = nodeToNegate
   }
 
-  run (): number {
-    return -this.nodeToNegate.run()
+  run () {
+    return this.nodeToNegate.run().map(result => -result)
   }
 }

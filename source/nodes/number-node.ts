@@ -18,6 +18,6 @@ export default class NumberNode implements IndividualNode {
    * Run this node, and return the number that it stores.
    */
   public run () {
-    return this.value
+    return [this.value]
   }
 }

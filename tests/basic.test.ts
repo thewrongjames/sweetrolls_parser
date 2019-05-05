@@ -8,15 +8,15 @@ test('An empty string fails to parse', () => {
 
 test('Numbers result in themselves', () => {
   const rootNode = parse('42')
-  expect(rootNode.run()).toEqual([42])
+  expect(rootNode.run()).toEqual([[42]])
 })
 
 test('Spaces don\'t ruin things', () => {
   const rootNode = parse(' \t  42 \n ')
-  expect(rootNode.run()).toEqual([42])
+  expect(rootNode.run()).toEqual([[42]])
 })
 
 test('Negative numbers work', () => {
   const rootNode = parse('-42')
-  expect(rootNode.run()).toEqual([-42])
+  expect(rootNode.run()).toEqual([[-42]])
 })

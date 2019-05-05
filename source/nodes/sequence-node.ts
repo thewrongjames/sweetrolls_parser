@@ -20,10 +20,10 @@ export default class SequenceNode implements BaseNode {
   /**
    * Evaluate every individual node in the sequence and get the result as an
    * array.
-   * @returns {number[]} The array of the results of evaluating every individual
+   * @returns {number[][]} The array of the results of evaluating every individual
    * node in the sequence.
    */
-  run (): number[] {
+  run (): number[][] {
     return this.individualNodes.map(individualNode => individualNode.run())
   }
 }
