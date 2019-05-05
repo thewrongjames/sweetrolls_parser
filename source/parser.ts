@@ -3,6 +3,7 @@ import SequenceNode from './nodes/sequence-node'
 import NumberNode from './nodes/number-node'
 import BinaryOperationNode from './nodes/binary-operation-node'
 import NegativeNode from './nodes/negative-node'
+import FunctionNode from './nodes/function-node'
 
 import SweetRollsError from './exceptions/sweet-rolls-error'
 import SweetRollsSyntaxError from './exceptions/sweet-rolls-syntax-error'
@@ -39,7 +40,7 @@ export default class Parser {
   public parse (): SequenceNode {
     this.positionInInput = 0
 
-    return this.parseSequence()
+    return this.parseSequence(false)
   }
 
   /**
@@ -119,11 +120,17 @@ export default class Parser {
     )
   }
 
-  private parseSequence (): SequenceNode {
+  private parseSequence (isBracketed: boolean): SequenceNode {
+    const startPosition = this.positionInInput
+
     const individualNodes: IndividualNode[] = []
     do {
       individualNodes.push(this.parseExpression(false))
     } while (this.consumeCharacterIfItIs(','))
+
+    if (isBracketed && !this.consumeCharacterIfItIs(')')) {
+      this.throwExpectionError(')', startPosition)
+    }
 
     return new SequenceNode(individualNodes)
   }
@@ -161,9 +168,20 @@ export default class Parser {
     if (this.next() === '(') {
       this.consumeCharacter()
       result = this.parseExpression(true)
-    } else {
-      result = this.parseNumber()
+      return isNegative ? new NegativeNode(result) : result
     }
+
+    let error: SweetRollsSyntaxError
+    for (const parser of [this.parseNumber]) {
+      try {
+        result = parser.call(this)
+        error = null
+        break
+      } catch (parserError) {
+        error = parserError
+      }
+    }
+    if (error) throw error
 
     return isNegative ? new NegativeNode(result) : result
   }
