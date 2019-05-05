@@ -41,3 +41,8 @@ test('Basic sum case works', () => {
   const rootNode = parse('sum(3, 5 * 12, -12/3)')
   expect(rootNode.run()).toEqual([[59]])
 })
+
+test('Sum on one nodes sums elements', () => {
+  const rootNode = parse('sum(max((1, 5, 6, 4), 3))')
+  expect(rootNode.run()).toEqual([[15]])
+})
