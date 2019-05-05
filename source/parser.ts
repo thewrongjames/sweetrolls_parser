@@ -4,6 +4,7 @@ import NumberNode from './nodes/number-node'
 import BinaryOperationNode from './nodes/binary-operation-node'
 import NegativeNode from './nodes/negative-node'
 import FunctionNode from './nodes/function-node'
+import RollNode from './nodes/roll-node'
 
 import SweetRollsError from './exceptions/sweet-rolls-error'
 import SweetRollsSyntaxError from './exceptions/sweet-rolls-syntax-error'
@@ -165,33 +166,37 @@ export default class Parser {
 
   private parseTerm (): IndividualNode {
     const isNegative = this.consumeCharacterIfItIs('-')
-    let result: IndividualNode
+    const makeResult = (node: IndividualNode) =>
+      isNegative ? new NegativeNode(node) : node
 
     if (this.next() === '(') {
       this.consumeCharacter()
-      result = this.parseExpression(true)
-      return isNegative ? new NegativeNode(result) : result
+      return makeResult(this.parseExpression(true))
     }
 
-    let finalError: SweetRollsSyntaxError
-    for (const parser of [this.parseNumber, this.parseFunctionCall]) {
-      try {
-        result = parser.call(this)
-        finalError = null
-        break
-      } catch (error) {
-        if (!(error instanceof SweetRollsSyntaxError)) throw error
-        finalError = error
+    let numberNode: NumberNode
+    try {
+      numberNode = this.parseNumber()
+      if (
+        this.consumeCharacterIfItIs('d') || this.consumeCharacterIfItIs('D')
+      ) {
+        return makeResult(this.parseRestOfRoll(numberNode))
       }
+    } catch (error) {
+      if (!(error instanceof SweetRollsSyntaxError)) throw error
     }
-    if (finalError) throw finalError
 
-    return isNegative ? new NegativeNode(result) : result
+    if (numberNode) return makeResult(numberNode)
+    return makeResult(this.parseFunctionCall())
   }
 
   private parseNumber (): NumberNode {
     const number = parseInt(this.consumeCharactersInString(DIGITS, 'number'))
     return new NumberNode(number)
+  }
+
+  private parseRestOfRoll (diceNumberNode: NumberNode): RollNode {
+    return new RollNode(diceNumberNode, this.parseNumber())
   }
 
   private parseFunctionCall (): FunctionNode {
