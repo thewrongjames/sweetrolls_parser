@@ -4,7 +4,7 @@ import SweetRollsRuntimeError from '../exceptions/sweet-rolls-runtime-error'
 
 export default abstract class FunctionNode implements IndividualNode {
   private argumentNodes: IndividualNode[]
-  protected abstract nodeFunction(sequence: number[][]): number[]
+  protected abstract nodeFunction(argumentNodes: IndividualNode[]): number[]
 
   constructor (argumentNodes: Array<SequenceNode | IndividualNode>) {
     this.argumentNodes = argumentNodes.map(argumentNode => {
@@ -16,9 +16,7 @@ export default abstract class FunctionNode implements IndividualNode {
   }
 
   run () {
-    return this.nodeFunction(
-      this.argumentNodes.map(argumentNode => argumentNode.run())
-    )
+    return this.nodeFunction(this.argumentNodes)
   }
 }
 
@@ -32,9 +30,10 @@ class IndividualNodeFromSequenceNode implements IndividualNode {
   run () {
     return this.sequenceNode.run().map(result => {
       if (result.length === 1) return result[0]
-      throw new SweetRollsRuntimeError(
-        'Elements in a function argument sequence cannot be longer than one'
-      )
+      throw new SweetRollsRuntimeError(`
+        Elements in a function argument sequence cannot be longer than 1, got
+        ${result.length}
+      `)
     })
   }
 }

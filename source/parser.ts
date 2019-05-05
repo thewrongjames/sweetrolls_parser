@@ -9,8 +9,8 @@ import SweetRollsError from './exceptions/sweet-rolls-error'
 import SweetRollsSyntaxError from './exceptions/sweet-rolls-syntax-error'
 
 import BinaryOperator from './binaryOperator'
-
 import BINARY_OPERATORS from './binaryOperators'
+import { FUNCTION_NAME_CHARACTERS, functionNameMappings } from './functions'
 
 const ERROR_CONTEXT_LENGTH = 10
 const DIGITS = '0123456789'
@@ -84,18 +84,20 @@ export default class Parser {
     return true
   }
 
-  private consumeNumber (): number {
+  private consumeCharactersInString (
+    acceptableCharacters: string, name: string
+  ): string {
     const startPosition = this.positionInInput
 
-    let stringOfNumber = ''
+    let consumedString = ''
 
-    while (DIGITS.includes(this.next())) {
-      stringOfNumber += this.consumeCharacter()
+    while (acceptableCharacters.includes(this.next())) {
+      consumedString += this.consumeCharacter()
     }
 
-    if (!stringOfNumber) this.throwExpectionError('number', startPosition)
+    if (!consumedString) this.throwExpectionError(name, startPosition)
 
-    return parseInt(stringOfNumber)
+    return consumedString
   }
 
   /**
@@ -140,7 +142,7 @@ export default class Parser {
 
     const termNode = this.parseTerm()
 
-    let finished = this.finished() || this.next() === ','
+    let finished = this.finished() || this.next() === ',' || this.next() === ')'
 
     // We have reached what should be the end of an expression (the end of input
     // or a comma) but we didn't close the brackets containing this expression
@@ -171,24 +173,56 @@ export default class Parser {
       return isNegative ? new NegativeNode(result) : result
     }
 
-    let error: SweetRollsSyntaxError
-    for (const parser of [this.parseNumber]) {
+    let finalError: SweetRollsSyntaxError
+    for (const parser of [this.parseNumber, this.parseFunctionCall]) {
       try {
         result = parser.call(this)
-        error = null
+        finalError = null
         break
-      } catch (parserError) {
-        error = parserError
+      } catch (error) {
+        if (!(error instanceof SweetRollsSyntaxError)) throw error
+        finalError = error
       }
     }
-    if (error) throw error
+    if (finalError) throw finalError
 
     return isNegative ? new NegativeNode(result) : result
   }
 
   private parseNumber (): NumberNode {
-    const number = this.consumeNumber()
+    const number = parseInt(this.consumeCharactersInString(DIGITS, 'number'))
     return new NumberNode(number)
+  }
+
+  private parseFunctionCall (): FunctionNode {
+    let startPosition = this.positionInInput
+    const functionName = this.consumeCharactersInString(
+      FUNCTION_NAME_CHARACTERS, 'function name'
+    )
+    if (!functionNameMappings[functionName]) {
+      this.throwExpectionError('function', startPosition)
+    }
+
+    if (!this.consumeCharacterIfItIs('(')) {
+      this.throwExpectionError('function', startPosition)
+    }
+
+    const argumentNodes: Array<IndividualNode | SequenceNode> = []
+    do {
+      let argumentNode: IndividualNode | SequenceNode
+      if (this.consumeCharacterIfItIs('(')) {
+        argumentNode = this.parseSequence(true)
+      } else {
+        argumentNode = this.parseExpression(false)
+      }
+      argumentNodes.push(argumentNode)
+    } while (this.consumeCharacterIfItIs(','))
+
+    if (!this.consumeCharacterIfItIs(')')) {
+      this.throwExpectionError('function', startPosition)
+    }
+
+    return new functionNameMappings[functionName](argumentNodes)
   }
 
   private parseRestOfBinaryOperation (
