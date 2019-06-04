@@ -42,7 +42,7 @@ export default class Parser {
     this.positionInInput = 0
 
     const result = this.parseSequence(false)
-    if (this.next()) this.throwExpectionError('end of input', 0)
+    if (this.next) this.throwExpectionError('end of input', 0)
 
     return result
   }
@@ -50,10 +50,10 @@ export default class Parser {
   /**
    * Return the next unconsumed character in the input. Return null if there are
    * no characters left.
-   * @returns {string} The next unconsumed character in the input, or null if
+   * @returns {string | null} The next unconsumed character in the input, or null if
    * there are none left.
    */
-  private next (): string {
+  get next (): string | null {
     const nextCharacter =
       this.input.substring(this.positionInInput, this.positionInInput + 1)
     return nextCharacter || null
@@ -63,14 +63,14 @@ export default class Parser {
     return this.positionInInput === this.input.length
   }
 
-  private consumeCharacter (): string {
-    if (!this.next()) {
+  private consumeCharacter (): string | null {
+    if (!this.next) {
       throw new SweetRollsSyntaxError(
         `Unexpected end of input at ${this.positionInInput}`
       )
     }
 
-    const consumedCharacter = this.next()
+    const consumedCharacter = this.next
     this.positionInInput += 1
     return consumedCharacter
   }
@@ -83,7 +83,7 @@ export default class Parser {
    * character (and hence whether or not it was consumed).
    */
   private consumeCharacterIfItIs (character: string): boolean {
-    if (this.next() !== character) return false
+    if (this.next !== character) return false
     this.consumeCharacter()
     return true
   }
@@ -95,7 +95,7 @@ export default class Parser {
 
     let consumedString = ''
 
-    while (acceptableCharacters.includes(this.next())) {
+    while (this.next && acceptableCharacters.includes(this.next)) {
       consumedString += this.consumeCharacter()
     }
 
@@ -146,7 +146,7 @@ export default class Parser {
 
     const termNode = this.parseTerm()
 
-    let finished = this.finished() || this.next() === ',' || this.next() === ')'
+    let finished = this.finished() || this.next === ',' || this.next === ')'
 
     // We have reached what should be the end of an expression (the end of input
     // or a comma) but we didn't close the brackets containing this expression
@@ -172,12 +172,12 @@ export default class Parser {
     const makeResult = (node: IndividualNode) =>
       isNegative ? new NegativeNode(node) : node
 
-    if (this.next() === '(') {
+    if (this.next === '(') {
       this.consumeCharacter()
       return makeResult(this.parseExpression(true))
     }
 
-    let numberNode: NumberNode
+    let numberNode: NumberNode | null = null
     try {
       numberNode = this.parseNumber()
       if (
@@ -238,7 +238,7 @@ export default class Parser {
   ): BinaryOperationNode {
     const startPosition = this.positionInInput
 
-    if (!BINARY_OPERATORS.includes(this.next())) {
+    if (!this.next || !BINARY_OPERATORS.includes(this.next)) {
       this.throwExpectionError('one of ' + BINARY_OPERATORS, startPosition)
     }
 
@@ -252,6 +252,6 @@ export default class Parser {
       this.throwExpectionError('number', startPosition)
     }
 
-    return new BinaryOperationNode(leftNode, operator, rightNode)
+    return new BinaryOperationNode(leftNode, operator, rightNode!)
   }
 }

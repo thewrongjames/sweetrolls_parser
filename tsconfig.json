@@ -5,6 +5,7 @@
     "allowJs": true,
     "target": "es6",
     "esModuleInterop": true,
+    "strict": true,
     "lib": [
       "es2017"
     ]
