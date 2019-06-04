@@ -1,2 +1,4 @@
 import { parse } from './source/index'
-export default parse
+import SequenceNode from './source/nodes/sequence-node'
+
+export { parse, SequenceNode }
