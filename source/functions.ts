@@ -1,4 +1,3 @@
-import FunctionNode from './nodes/function-node'
 import MaxNode from './nodes/max-node'
 import MinNode from './nodes/min-node'
 import RepeatNode from './nodes/repeat-node'
