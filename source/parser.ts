@@ -41,7 +41,10 @@ export default class Parser {
   public parse (): SequenceNode {
     this.positionInInput = 0
 
-    return this.parseSequence(false)
+    const result = this.parseSequence(false)
+    if (this.next()) this.throwExpectionError('end of input', 0)
+
+    return result
   }
 
   /**
