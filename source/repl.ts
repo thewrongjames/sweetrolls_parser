@@ -16,7 +16,7 @@ const main = async () => {
 
   let input
   while (true) {
-    input = (await getPromiseOfPromptResponse()).toLowerCase()
+    input = await getPromiseOfPromptResponse()
 
     if (input === 'exit') break
 

@@ -12,5 +12,8 @@
   },
   "include": [
     "./source/**/*"
+  ],
+  "exclude": [
+    "./source/__mocks__"
   ]
 }
