@@ -16,3 +16,8 @@ test('Dice work in functions', () => {
   const rootNode = parse('sum(max(repeat(1d6, 4), 3))')
   expect(rootNode.run()).toEqual([[3]])
 })
+
+test('Capital D splits up the rolls', () => {
+  const rootNode = parse('5D3')
+  expect(rootNode.run()).toEqual([[1, 2, 3, 1, 2]])
+})

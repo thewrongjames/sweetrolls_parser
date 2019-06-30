@@ -180,10 +180,11 @@ export default class Parser {
     let numberNode: NumberNode | null = null
     try {
       numberNode = this.parseNumber()
-      if (
-        this.consumeCharacterIfItIs('d') || this.consumeCharacterIfItIs('D')
-      ) {
-        return makeResult(this.parseRestOfRoll(numberNode))
+      if (this.consumeCharacterIfItIs('d')) {
+        return makeResult(this.parseRestOfRoll(numberNode, true))
+      }
+      if (this.consumeCharacterIfItIs('D')) {
+        return makeResult(this.parseRestOfRoll(numberNode, false))
       }
     } catch (error) {
       if (!(error instanceof SweetRollsSyntaxError)) throw error
@@ -198,8 +199,10 @@ export default class Parser {
     return new NumberNode(number)
   }
 
-  private parseRestOfRoll (diceNumberNode: NumberNode): RollNode {
-    return new RollNode(diceNumberNode, this.parseNumber())
+  private parseRestOfRoll (
+    diceNumberNode: NumberNode, sumRolls: boolean
+  ): RollNode {
+    return new RollNode(diceNumberNode, this.parseNumber(), sumRolls)
   }
 
   private parseFunctionCall (): FunctionNode {
