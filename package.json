@@ -1,13 +1,13 @@
 {
   "name": "sweetrolls_parser",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A parser for a small dice rolling math language for a web app for rolling dice with friends.",
   "main": "built/index.js",
   "scripts": {
     "start": "tsc --build tsconfig.json && node built/repl.js",
     "build": "tsc --build tsconfig.json",
     "test": "jest --coverage",
-    "lint": "eslint 'source/**/*.ts' && eslint 'source/**/*.ts'"
+    "lint": "eslint 'source/**/*.ts'"
   },
   "repository": {
     "type": "git",
