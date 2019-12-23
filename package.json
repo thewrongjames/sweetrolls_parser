@@ -37,30 +37,29 @@
     },
     "overrides": [
       {
-        "files": ["**/*.ts"],
+        "files": [
+          "**/*.ts"
+        ],
         "rules": {
-          "no-unused-vars": ["off"],
-          "no-undef": ["off"]
+          "no-unused-vars": "off",
+          "no-undef": "off",
+          "no-useless-constructor": "off",
+          "@typescript-eslint/no-useless-constructor": "error"
         }
       }
     ]
   },
   "devDependencies": {
-    "@types/jest": "^24.0.11",
-    "@types/node": "11.11.3",
-    "@typescript-eslint/eslint-plugin": "^1.4.2",
-    "@typescript-eslint/parser": "^1.4.2",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-typescript": "github:nzakas/eslint-plugin-typescript",
-    "jest": "^24.7.1",
-    "standard": "^12.0.1",
-    "ts-jest": "^24.0.1",
-    "typescript": "3.3.3333",
-    "typescript-eslint-parser": "^22.0.0"
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.14",
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "eslint": "^6.7.2",
+    "eslint-config-standard": "^14.1.0",
+    "jest": "^24.9.0",
+    "standard": "^14.3.1",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.3"
   },
   "standard": {
     "globals": [
@@ -68,6 +67,8 @@
       "expect",
       "describe"
     ],
-    "ignore": ["built"]
+    "ignore": [
+      "built"
+    ]
   }
 }
