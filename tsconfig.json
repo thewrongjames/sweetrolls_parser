@@ -3,11 +3,11 @@
     "module": "commonjs",
     "outDir": "./built",
     "allowJs": true,
-    "target": "es6",
+    "target": "es2019",
     "esModuleInterop": true,
     "strict": true,
     "lib": [
-      "es2017"
+      "es2019"
     ]
   },
   "include": [
