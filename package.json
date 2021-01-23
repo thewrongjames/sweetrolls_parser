@@ -37,10 +37,16 @@
     },
     "overrides": [
       {
-        "files": ["**/*.ts"],
+        "files": [
+          "**/*.ts"
+        ],
         "rules": {
-          "no-unused-vars": ["off"],
-          "no-undef": ["off"]
+          "no-unused-vars": [
+            "off"
+          ],
+          "no-undef": [
+            "off"
+          ]
         }
       }
     ]
@@ -58,7 +64,7 @@
     "eslint-plugin-typescript": "github:nzakas/eslint-plugin-typescript",
     "jest": "^24.7.1",
     "standard": "^12.0.1",
-    "ts-jest": "^24.0.1",
+    "ts-jest": "^26.4.4",
     "typescript": "3.3.3333",
     "typescript-eslint-parser": "^22.0.0"
   },
@@ -68,6 +74,8 @@
       "expect",
       "describe"
     ],
-    "ignore": ["built"]
+    "ignore": [
+      "built"
+    ]
   }
 }

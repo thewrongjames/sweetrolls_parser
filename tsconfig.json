@@ -3,12 +3,10 @@
     "module": "commonjs",
     "outDir": "./built",
     "allowJs": true,
-    "target": "es6",
+    "target": "esnext",
     "esModuleInterop": true,
     "strict": true,
-    "lib": [
-      "es2017"
-    ]
+    "lib": ["esnext"]
   },
   "include": [
     "./source/**/*"
